@@ -1,0 +1,29 @@
+machine:
+  environment:
+    NODE_ENV: 'production'
+  services:
+    - docker
+  node:
+    version: v8.1.2
+
+dependencies:
+  cache_directories:
+    - ~/.cache/yarn
+  override:
+    - NODE_ENV=development yarn install
+  pre:
+    - rm -rf ~/.yarn
+    - npm install -g yarn
+    - yarn -v
+
+test:
+  override:
+    - yarn
+
+deployment:
+  prod:
+    branch: master
+    commands:
+      - docker build -t loveit/wappalyzer-api .
+      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+      - docker push loveit/wappalyzer-api
